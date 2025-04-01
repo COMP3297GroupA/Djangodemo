@@ -1,0 +1,8 @@
+<h1>{{ accommodation.type }}</h1>
+<p>Price: {{ accommodation.price }} HKD</p>
+<p>Bedrooms: {{ accommodation.number_of_bedrooms }}</p>
+<p>Beds: {{ accommodation.number_of_beds }}</p>
+<p>Distance: {{ accommodation.distance }} km</p>
+<p>Available: {{ accommodation.period_of_availability }}</p>
+
+<a href="{% url 'reserve_accommodation' accommodation.accommodation_id %}">Reserve</a>

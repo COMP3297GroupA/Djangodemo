@@ -17,14 +17,28 @@
 
 <hr/>
 
-{% if accommodations %}
-    {% for acc in accommodations %}
-        <div style="margin-bottom: 20px;">
-            <h3>{{ acc.type }} — {{ acc.price }} HKD</h3>
-            <p>Distance: {{ acc.distance }} km</p>
-            <a href="{% url 'accommodation_detail' acc.accommodation_id %}">View Details</a>
-        </div>
-    {% endfor %}
-{% else %}
-    <p>No accommodations found.</p>
-{% endif %}
+<!-- 展示accomodation信息 -->
+{% for acc in accommodations %}
+    <div style="margin-bottom: 20px;">
+        <h3>{{ acc.type }} — {{ acc.price }} HKD</h3>
+        <p>Distance: {{ acc.distance }} km</p>
+        <p><strong>Address:</strong> {{ acc.address }}</p>
+
+        {% if acc.is_reserved %}
+            <p style="color: red;"><strong>Status:</strong> Reserved</p>
+        {% else %}
+            <p style="color: green;"><strong>Status:</strong> Available</p>
+        {% endif %}
+
+        <a href="{% url 'accommodation_detail' acc.address %}">View Details</a>
+    </div>
+{% endfor %}
+
+
+<!-- 添加logout -->
+<p style="text-align:right;">
+    Logged in as: {{ request.session.member_name }} |
+    <a href="{% url 'logout' %}">Logout</a>
+</p>
+
+

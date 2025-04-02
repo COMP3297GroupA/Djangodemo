@@ -1,6 +1,17 @@
 <h2>Confirm Reservation</h2>
 <p>Are you sure you want to reserve {{ accommodation.type }} for {{ accommodation.price }} HKD?</p>
 
+{% if error %}
+    <p style="color: red;"><strong>{{ error }}</strong></p>
+{% endif %}
+
+<h2>Confirm Reservation</h2>
+<p><strong>Type:</strong> {{ accommodation.type }}</p>
+<p><strong>Price:</strong> {{ accommodation.price }} HKD</p>
+<p><strong>Address:</strong> {{ accommodation.address }}</p>
+<p><strong>Distance:</strong> {{ accommodation.distance }} km</p>
+
+
 <form method="post">
     {% csrf_token %}
     <button type="submit">Yes, Confirm</button>

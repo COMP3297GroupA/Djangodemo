@@ -22,7 +22,7 @@ class CEDARSSpecialist(models.Model):
 
 # Accommodation model
 class Accommodation(models.Model):
-    accommodation_id = models.AutoField(primary_key=True)
+    address = models.CharField(max_length=255, primary_key=True)   #说是id,但是将地址作为PK
     type = models.CharField(max_length=50)
     period_of_availability = models.CharField(max_length=100)
     number_of_beds = models.IntegerField()
@@ -38,12 +38,12 @@ class Accommodation(models.Model):
 
 # HKU Member model
 class HKUMember(models.Model):
-    member_id = models.AutoField(primary_key=True)
+    member_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=100)
     contact_info = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.member_id})"
 
 
 # Reservation model

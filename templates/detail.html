@@ -1,8 +1,24 @@
-<h1>{{ accommodation.type }}</h1>
+<!-- <h1>{{ accommodation.type }}</h1>
 <p>Price: {{ accommodation.price }} HKD</p>
 <p>Bedrooms: {{ accommodation.number_of_bedrooms }}</p>
 <p>Beds: {{ accommodation.number_of_beds }}</p>
 <p>Distance: {{ accommodation.distance }} km</p>
-<p>Available: {{ accommodation.period_of_availability }}</p>
+<p>Available: {{ accommodation.period_of_availability }} month</p>
 
-<a href="{% url 'reserve_accommodation' accommodation.accommodation_id %}">Reserve</a>
+<a href="{% url 'reserve_accommodation' accommodation.address %}">Reserve</a> -->
+
+<h1>{{ accommodation.type }}</h1>
+<p><strong>Price:</strong> {{ accommodation.price }} HKD</p>
+<p><strong>Bedrooms:</strong> {{ accommodation.number_of_bedrooms }}</p>
+<p><strong>Beds:</strong> {{ accommodation.number_of_beds }}</p>
+<p><strong>Distance:</strong> {{ accommodation.distance }} km</p>
+<p><strong>Available:</strong> {{ accommodation.period_of_availability }}</p>
+<p><strong>Address:</strong> {{ accommodation.address }}</p>
+
+{% if is_reserved %}
+    <p style="color: red;"><strong>Status:</strong> Reserved</p>
+{% else %}
+    <p style="color: green;"><strong>Status:</strong> Available</p>
+{% endif %}
+
+<a href="{% url 'reserve_accommodation' accommodation.address %}">Reserve</a>

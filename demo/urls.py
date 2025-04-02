@@ -18,8 +18,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include  # include is required
+from orders import views 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('orders.urls')),  # 👈 this line connects your app's URLs
+    path('', views.login_member, name='login'),  # ✅ 默认首页就是登录页
+    path('logout/', views.logout_member, name='logout'),
+    path('accommodations/', views.browse_accommodations, name='browse_accommodations'),
+    path('accommodations/<str:address>/', views.accommodation_detail, name='accommodation_detail'),
+    path('accommodations/<str:address>/reserve/', views.reserve_accommodation, name='reserve_accommodation'),
+    # path('', include('orders.urls')),  # 👈 this line connects your app's URLs
 ]

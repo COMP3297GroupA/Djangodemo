@@ -13,15 +13,20 @@ def browse_accommodations(request):
     accommodations = Accommodation.objects.all()
 
     acc_type = request.GET.get('type')
+    min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
+    min_distance = request.GET.get('min_distance')
     max_distance = request.GET.get('max_distance')
     sort_by = request.GET.get('sort_by')
 
     # 只有在参数不为空时才进行过滤
-    if acc_type and acc_type.strip() != "":
-        accommodations = accommodations.filter(type__icontains=acc_type)
+    if min_price and min_price.strip() != "":
+        accommodations = accommodations.filter(price__gte=min_price)
     if max_price and max_price.strip() != "":
         accommodations = accommodations.filter(price__lte=max_price)
+
+    if min_distance and min_distance.strip() != "":
+        accommodations = accommodations.filter(distance__gte=min_distance)
     if max_distance and max_distance.strip() != "":
         accommodations = accommodations.filter(distance__lte=max_distance)
 
@@ -37,12 +42,14 @@ def browse_accommodations(request):
 
     return render(request, 'browse.html', {
         'accommodations': accommodations,
-        'filters': {
-            'type': acc_type or '',
-            'max_price': max_price or '',
-            'max_distance': max_distance or '',
-            'sort_by': sort_by or '',
-        }
+            'filters': {
+                'type': acc_type or '',
+                'min_price': min_price or '',
+                'max_price': max_price or '',
+                'min_distance': min_distance or '',
+                'max_distance': max_distance or '',
+                'sort_by': sort_by or '',
+            }
     })
 
 
@@ -217,20 +224,20 @@ def add_accommodation(request):
         beds = request.POST.get('beds')
         period = request.POST.get('period_of_availability') 
 
-        # ✅ 从 session 获取当前登录的 owner_id
+        # 从 session 获取当前登录的 owner_id
         owner_id = request.session.get('owner_id')
         if not owner_id:
             messages.error(request, "Session expired. Please log in again.")
             return redirect('login')
 
-        # ✅ 查找该 owner 实例
+        # 查找该 owner 实例
         try:
             owner = PropertyOwner.objects.get(owner_id=owner_id)
         except PropertyOwner.DoesNotExist:
             messages.error(request, "Owner not found.")
             return redirect('login')
 
-        # ✅ 创建新的 accommodation 并关联 owner
+        # 创建新的 accommodation 并关联 owner
         Accommodation.objects.create(
             address=address,
             type=acc_type,

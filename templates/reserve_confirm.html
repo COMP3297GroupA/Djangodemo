@@ -1,4 +1,4 @@
-<h2>Confirm Reservation</h2>
+<!-- <h2>Confirm Reservation</h2>
 <p>Are you sure you want to reserve {{ accommodation.type }} for {{ accommodation.price }} HKD?</p>
 
 {% if error %}
@@ -16,4 +16,107 @@
     {% csrf_token %}
     <button type="submit">Yes, Confirm</button>
 </form>
-<a href="{% url 'browse_accommodations' %}">Cancel</a>
+<a href="{% url 'browse_accommodations' %}">Cancel</a> -->
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Reservation</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f8f9fa;
+            padding: 40px;
+        }
+        .card {
+            background-color: #fff;
+            max-width: 650px;
+            margin: auto;
+            padding: 30px 40px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .subtitle {
+            margin-bottom: 25px;
+            font-size: 18px;
+            color: #555;
+        }
+        .info p {
+            margin: 6px 0;
+            font-size: 16px;
+        }
+        .info strong {
+            color: #222;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+        .btn-group {
+            margin-top: 30px;
+        }
+        .btn {
+            font-size: 16px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-confirm {
+            background-color: #007bff;
+            color: white;
+            margin-right: 15px;
+        }
+        .btn-confirm:hover {
+            background-color: #0056b3;
+        }
+        .btn-cancel {
+            background-color: transparent;
+            color: #666;
+            text-decoration: underline;
+        }
+        .btn-cancel:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Confirm Reservation</h2>
+        <p class="subtitle">Are you sure you want to reserve <strong>{{ accommodation.type }}</strong> for <strong>{{ accommodation.price }} HKD</strong>?</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="info">
+            <p><strong>Type:</strong> {{ accommodation.type }}</p>
+            <p><strong>Price:</strong> {{ accommodation.price }} HKD</p>
+            <p><strong>Address:</strong> {{ accommodation.address }}</p>
+            <p><strong>Distance:</strong> {{ accommodation.distance }} km</p>
+        </div>
+
+        {% if not error %}
+        <form method="post" class="btn-group">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-confirm">Yes, Confirm</button>
+            <a href="{% url 'browse_accommodations' %}" class="btn btn-cancel">Cancel</a>
+        </form>
+        {% else %}
+        <div class="btn-group">
+            <a href="{% url 'browse_accommodations' %}" class="btn btn-cancel">Back to Browse</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,44 +1,94 @@
-<h1>Browse Accommodations</h1>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Accommodations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
 
-<form method="get">
-    <input type="text" name="type" placeholder="Type" value="{{ filters.type }}">
-    <input type="number" name="max_price" placeholder="Max Price" value="{{ filters.max_price }}">
-    <input type="number" step="0.1" name="max_distance" placeholder="Max Distance (km)" value="{{ filters.max_distance }}">
+        .accommodation-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
 
-    <label>Sort by:</label>
-    <select name="sort_by" onchange="this.form.submit()">
-        <option value="">-- Select --</option>
-        <option value="price" {% if filters.sort_by == 'price' %}selected{% endif %}>Price</option>
-        <option value="distance" {% if filters.sort_by == 'distance' %}selected{% endif %}>Distance</option>
-    </select>
+        .status-reserved {
+            color: #dc3545;
+            font-weight: bold;
+        }
 
-    <button type="submit">Search</button>
-</form>
+        .status-available {
+            color: #198754;
+            font-weight: bold;
+        }
 
-<hr/>
+        .logout-text {
+            text-align: right;
+            font-size: 0.95rem;
+            margin-top: 30px;
+        }
 
-<!-- 展示accomodation信息 -->
-{% for acc in accommodations %}
-    <div style="margin-bottom: 20px;">
-        <h3>{{ acc.type }} — {{ acc.price }} HKD</h3>
-        <p>Distance: {{ acc.distance }} km</p>
-        <p><strong>Address:</strong> {{ acc.address }}</p>
+        h1 {
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
 
-        {% if acc.is_reserved %}
-            <p style="color: red;"><strong>Status:</strong> Reserved</p>
-        {% else %}
-            <p style="color: green;"><strong>Status:</strong> Available</p>
-        {% endif %}
+<div class="container my-5">
+    <h1>Browse Accommodations</h1>
 
-        <a href="{% url 'accommodation_detail' acc.address %}">View Details</a>
-    </div>
-{% endfor %}
+    <!-- Filter form -->
+    <form class="row g-2 mb-4" method="get">
+        <div class="col-md-3">
+            <input type="text" name="type" class="form-control" placeholder="Type" value="{{ filters.type }}">
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="max_price" class="form-control" placeholder="Max Price" value="{{ filters.max_price }}">
+        </div>
+        <div class="col-md-3">
+            <input type="number" step="0.1" name="max_distance" class="form-control" placeholder="Max Distance (km)" value="{{ filters.max_distance }}">
+        </div>
+        <div class="col-md-2">
+            <select name="sort_by" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Select --</option>
+                <option value="price" {% if filters.sort_by == 'price' %}selected{% endif %}>Price</option>
+                <option value="distance" {% if filters.sort_by == 'distance' %}selected{% endif %}>Distance</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
 
+    <!-- Accommodation listing -->
+    {% for acc in accommodations %}
+        <div class="accommodation-card">
+            <h4>{{ acc.type }} — {{ acc.price }} HKD</h4>
+            <p><strong>Distance:</strong> {{ acc.distance }} km</p>
+            <p><strong>Address:</strong> {{ acc.address }}</p>
 
-<!-- 添加logout -->
-<p style="text-align:right;">
-    Logged in as: {{ request.session.member_name }} |
-    <a href="{% url 'logout' %}">Logout</a>
-</p>
+            {% if acc.is_reserved %}
+                <p class="status-reserved"><strong>Status:</strong> Reserved</p>
+            {% else %}
+                <p class="status-available"><strong>Status:</strong> Available</p>
+            {% endif %}
 
+            <a href="{% url 'accommodation_detail' acc.address %}" class="btn btn-outline-primary mt-2">View Details</a>
+        </div>
+    {% endfor %}
 
+    <!-- Logout info -->
+    <p class="logout-text">
+        Logged in as: <strong>{{ request.session.member_name }}</strong> |
+        <a href="{% url 'logout' %}">Logout</a>
+    </p>
+</div>
+
+</body>
+</html>

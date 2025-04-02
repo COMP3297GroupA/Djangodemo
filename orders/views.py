@@ -20,6 +20,8 @@ def browse_accommodations(request):
     sort_by = request.GET.get('sort_by')
 
     # 只有在参数不为空时才进行过滤
+    if acc_type and acc_type.strip() != "":
+        accommodations = accommodations.filter(type__icontains=acc_type)
     if min_price and min_price.strip() != "":
         accommodations = accommodations.filter(price__gte=min_price)
     if max_price and max_price.strip() != "":

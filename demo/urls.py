@@ -16,16 +16,41 @@ Including another URLconf
 """
 
 
+# from django.contrib import admin
+# from django.urls import path, include  # include is required
+# from orders import views 
+
+# urlpatterns = [
+
+# ]
+
+
+
 from django.contrib import admin
-from django.urls import path, include  # include is required
-from orders import views 
+from django.urls import path, include
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('api/', include('orders.urls')),  
+# ]
+
+
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="UniHaven API",
+      default_version='v1',
+      description="API for managing accommodations and reservations",
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.login_member, name='login'),  #默认首页就是登录页
-    path('logout/', views.logout_member, name='logout'),
-    path('accommodations/', views.browse_accommodations, name='browse_accommodations'),
-    path('accommodations/<str:address>/', views.accommodation_detail, name='accommodation_detail'),
-    path('accommodations/<str:address>/reserve/', views.reserve_accommodation, name='reserve_accommodation'),
-    path('', include('orders.urls')),  # 👈 this line connects your app's URLs
+    path('api/', include('orders.urls')),  # 你的 app api 路由
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

@@ -37,62 +37,14 @@
 #             return Response({'error': 'No active reservation.'}, status=404)
 
 
-<<<<<<< HEAD
+
+
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Accommodation, Reservation
 from .serializers import AccommodationSerializer, ReservationSerializer
-=======
-# 1. Browse + Filter + Sort accommodations
-def browse_accommodations(request):
-
-    accommodations = Accommodation.objects.all()
-
-    acc_type = request.GET.get('type')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    min_distance = request.GET.get('min_distance')
-    max_distance = request.GET.get('max_distance')
-    sort_by = request.GET.get('sort_by')
-
-    # 只有在参数不为空时才进行过滤
-    if acc_type and acc_type.strip() != "":
-        accommodations = accommodations.filter(type__icontains=acc_type)
-    if min_price and min_price.strip() != "":
-        accommodations = accommodations.filter(price__gte=min_price)
-    if max_price and max_price.strip() != "":
-        accommodations = accommodations.filter(price__lte=max_price)
-
-    if min_distance and min_distance.strip() != "":
-        accommodations = accommodations.filter(distance__gte=min_distance)
-    if max_distance and max_distance.strip() != "":
-        accommodations = accommodations.filter(distance__lte=max_distance)
-
-    # 排序逻辑
-    if sort_by == 'price':
-        accommodations = accommodations.order_by('price')
-    elif sort_by == 'distance':
-        accommodations = accommodations.order_by('distance')
-
-    #  accommodation 是否已预订
-    for acc in accommodations:
-        acc.is_reserved = acc.reservations.filter(status='confirmed').exists()
-
-    return render(request, 'browse.html', {
-        'accommodations': accommodations,
-            'filters': {
-                'type': acc_type or '',
-                'min_price': min_price or '',
-                'max_price': max_price or '',
-                'min_distance': min_distance or '',
-                'max_distance': max_distance or '',
-                'sort_by': sort_by or '',
-            }
-    })
->>>>>>> c322db106e17935c56c39b3bfd6d927cceccdd19
-
 
 class AccommodationViewSet(viewsets.ModelViewSet):
     queryset = Accommodation.objects.all()
@@ -131,13 +83,7 @@ class AccommodationViewSet(viewsets.ModelViewSet):
             return Response({'error': 'No active reservation.'}, status=404)
 
 
-<<<<<<< HEAD
 class ReservationViewSet(viewsets.ModelViewSet):  # 为 specialist 添加
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
-=======
-        messages.success(request, "Accommodation added successfully.")
-        return redirect('owner_dashboard')
 
-    return render(request, 'add_accommodation.html')
->>>>>>> c322db106e17935c56c39b3bfd6d927cceccdd19

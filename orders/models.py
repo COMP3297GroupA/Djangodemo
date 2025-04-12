@@ -3,6 +3,7 @@ from math import cos, sqrt, radians
 import requests
 from urllib.parse import quote
 import xml.etree.ElementTree as ET
+from django.contrib.auth.models import User 
 
 HKU_LAT = 22.2838
 HKU_LON = 114.1371
@@ -10,6 +11,7 @@ EARTH_RADIUS = 6371  # 公里
 ALS_ENDPOINT = 'https://www.als.gov.hk/lookup'
 
 class Accommodation(models.Model):
+    address = models.CharField(max_length=255, primary_key=True)
     address = models.CharField(max_length=255, primary_key=True)
     type = models.CharField(max_length=50)
     period_of_availability = models.CharField(max_length=100)
@@ -75,6 +77,11 @@ class Accommodation(models.Model):
 
     def __str__(self):
         return f"{self.type} at {self.address}"
+    
+
+
+    owner_name = models.CharField(max_length=100)
+    contact_info = models.CharField(max_length=100) 
 
     @property
     def is_reserved(self):
@@ -91,10 +98,19 @@ class Reservation(models.Model):
     accommodation = models.ForeignKey(
         Accommodation, related_name='reservations', on_delete=models.CASCADE
     )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 记录预约人
+    start_date = models.DateField()  # 开始日期
+    end_date = models.DateField()    # 结束日期
+
     reservation_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='confirmed')
     rating = models.IntegerField(null=True, blank=True)  # Rating 0-5 after contract end
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='confirmed')
+    rating = models.IntegerField(null=True, blank=True)  # Rating 0-5 after contract end
 
+    # def __str__(self):
+    #     return f"{self.accommodation.address} — {self.status}"
     def __str__(self):
-        return f"{self.accommodation.address} — {self.status}"
+        return f"{self.accommodation.address} reserved by {self.user.email} from {self.start_date} to {self.end_date}"    
 

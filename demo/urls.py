@@ -26,6 +26,16 @@ Including another URLconf
 
 
 
+# from django.contrib import admin
+# from django.urls import path, include  # include is required
+# from orders import views 
+
+# urlpatterns = [
+
+# ]
+
+
+
 from django.contrib import admin
 from django.urls import path, include
 
@@ -34,23 +44,22 @@ from django.urls import path, include
 #     path('api/', include('orders.urls')),  
 # ]
 
-
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
-schema_view = get_schema_view(
-   openapi.Info(
-      title="UniHaven API",
-      default_version='v1',
-      description="API for managing accommodations and reservations",
-   ),
-   public=True,
-   permission_classes=[permissions.AllowAny],
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('orders.urls')),  # 你的 app api 路由
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/', include('orders.urls')),
+
+    # 这一行是关键，SwaggerView 和 RedocView 都依赖它
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    # Swagger UI
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+    # Redoc 文档（可选）
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

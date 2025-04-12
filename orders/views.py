@@ -1,14 +1,16 @@
-
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as django_filters
 from .models import Accommodation, Reservation
+
 from .serializers import AccommodationSerializer, ReservationSerializer, ReservationRequestSerializer, RatingSerializer
 from datetime import datetime
 from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema
+
+from .serializers import AccommodationSerializer, ReservationSerializer
 
 
 class AccommodationViewSet(viewsets.ModelViewSet):
@@ -110,6 +112,8 @@ class ReservationFilter(django_filters.FilterSet):    # 查询某个 accommodati
 class ReservationViewSet(viewsets.ModelViewSet):  # 为 specialist 添加
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+
+
     filter_backends = [DjangoFilterBackend]
     filterset_class = ReservationFilter
 
@@ -139,4 +143,7 @@ class ReservationViewSet(viewsets.ModelViewSet):  # 为 specialist 添加
             return Response(serializer.errors, status=400)
 
         except Reservation.DoesNotExist:
-            return Response({'error': 'Reservation not found.'}, status=404) 
+
+            return  Response({'error': 'Reservation not found.'}, status=404) 
+
+  

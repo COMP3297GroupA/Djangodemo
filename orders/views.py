@@ -3,14 +3,23 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as django_filters
-from .models import Accommodation, Reservation
+from .models import Accommodation, Reservation, HKU_LOCATIONS
 
 from .serializers import AccommodationSerializer, ReservationSerializer, ReservationRequestSerializer, RatingSerializer
 from datetime import datetime
 from django.contrib.auth.models import User
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from .serializers import AccommodationSerializer, ReservationSerializer
+from .serializers import AccommodationSerializer, ReservationSerializer,CancelReservationSerializer
+
+
+@extend_schema_view(
+    list=extend_schema(tags=["Accommodation"], summary="browse all accomodation info"),
+    retrieve=extend_schema(tags=["Accommodation"], summary="view details"),
+    create=extend_schema(tags=["Accommodation"], summary="upload new accomodation"),
+    update=extend_schema(tags=["Accommodation"], summary="update accomodation info"),
+    destroy=extend_schema(tags=["Accommodation"], summary="delete accomodation")
+)
 
 
 class AccommodationViewSet(viewsets.ModelViewSet):
@@ -24,6 +33,15 @@ class AccommodationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Accommodation.objects.all()
+
+        # 根据用户选的参考位置计算 distance
+        ref = self.request.query_params.get('ref', 'Main Campus')  # 默认为 Main Campus
+        ref_coords = HKU_LOCATIONS.get(ref)
+        
+        if ref_coords:
+            for accom in queryset:
+                accom.distance = accom.calculate_distance(*ref_coords)
+
         max_price = self.request.query_params.get('max_price')
         if max_price:
             queryset = queryset.filter(price__lte=max_price)
@@ -32,8 +50,11 @@ class AccommodationViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         request=ReservationRequestSerializer,  # 告诉 Swagger 请求体结构
-        responses=ReservationSerializer        # 告诉 Swagger 返回值结构
+        responses=ReservationSerializer,        # 告诉 Swagger 返回值结构
+        tags=["Reservation"],
+        summary="upload a reservation"
     )    
+
 
     @action(detail=True, methods=['post'], url_path='reserve', url_name='accommodations_reserve')
     def reserve(self, request, pk=None):
@@ -73,29 +94,60 @@ class AccommodationViewSet(viewsets.ModelViewSet):
 
         serializer = ReservationSerializer(reservation)
         return Response(serializer.data)  
-    
 
 
 
-    @action(detail=True, methods=['post'])
+
+
+    @extend_schema(
+        request=CancelReservationSerializer,
+        tags=["Reservation"],
+        summary="cancel a reservation"
+    )
+    @action(detail=True, methods=['post'], url_path='cancel')
     def cancel(self, request, pk=None):
+        # try:
+        #     reservation = Reservation.objects.get(accommodation_id=pk, status='confirmed')
+        #     reservation.status = 'cancelled'
+        #     reservation.save()
+        #     return Response({'message': 'Reservation cancelled.'})
+        # except Reservation.DoesNotExist:
+        #     return Response({'error': 'No active reservation.'}, status=404)
+        accommodation = self.get_object()
+        user = request.user
+
+        serializer = CancelReservationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
+        start_date = serializer.validated_data['start_date']
+        end_date = serializer.validated_data['end_date']
+
         try:
-            reservation = Reservation.objects.get(accommodation_id=pk, status='confirmed')
+            reservation = Reservation.objects.get(
+                accommodation=accommodation,
+                user=user,
+                start_date=start_date,
+                end_date=end_date,
+                status='confirmed'
+            )
             reservation.status = 'cancelled'
             reservation.save()
-            return Response({'message': 'Reservation cancelled.'})
+            return Response({'message': 'Reservation cancelled successfully.'})
         except Reservation.DoesNotExist:
-            return Response({'error': 'No active reservation.'}, status=404)
-        
+            return Response({'error': 'No matching reservation found for this time period.'}, status=404)
 
-        
-    @action(detail=True, methods=['get'])              
+    @extend_schema(
+        tags=["Reservation"],
+        summary="chcek a reserved time slots of the accomodation"
+    )
+    @action(detail=True, methods=['get'], url_path='reserved_periods')           
     def reserved_periods(self, request, pk=None):        #  展示已被预约的时间段
         accommodation = self.get_object()
         reservations = accommodation.reservations.filter(status='confirmed').values('start_date', 'end_date')
         return Response(list(reservations))
 
-
+# 
 
 class ReservationFilter(django_filters.FilterSet):    # 查询某个 accommodation 在某个日期范围内是否被预订
     start = django_filters.DateFilter(field_name="end_date", lookup_expr='gte')
@@ -120,7 +172,9 @@ class ReservationViewSet(viewsets.ModelViewSet):  # 为 specialist 添加
 
     @extend_schema(
         request=RatingSerializer,
-        responses={200: ReservationSerializer}
+        responses={200: ReservationSerializer},
+        tags=["Rating"],
+        summary="upload rating"
     )
     @action(detail=True, methods=['post'], url_path='rate')     # 评分功能，只有在reservation end time 之后才能进行评分
     def rate(self, request, pk=None):

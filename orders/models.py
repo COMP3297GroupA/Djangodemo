@@ -5,8 +5,13 @@ from urllib.parse import quote
 import xml.etree.ElementTree as ET
 from django.contrib.auth.models import User 
 
-HKU_LAT = 22.2838
-HKU_LON = 114.1371
+HKU_LOCATIONS = {
+    'Main Campus': (22.28405, 114.13784),
+    'Sassoon Road Campus': (22.26725, 114.12881),
+    'Swire Institute of Marine Science': (22.20805, 114.26021),
+    'Kadoorie Centre': (22.43022, 114.11429),
+    'Faculty of Dentistry': (22.28649, 114.14426)
+}
 EARTH_RADIUS = 6371  # 公里
 ALS_ENDPOINT = 'https://www.als.gov.hk/lookup'
 
@@ -58,10 +63,10 @@ class Accommodation(models.Model):
         except Exception as e:
             print(f"[ALS Lookup Error] {e}")        
 
-    def calculate_distance(self):
+    def calculate_distance(self, ref_lat, ref_lon):
         if self.latitude is not None and self.longitude is not None:
-            lat1 = radians(HKU_LAT)
-            lon1 = radians(HKU_LON)
+            lat1 = radians(ref_lat)
+            lon1 = radians(ref_lon)
             lat2 = radians(self.latitude)
             lon2 = radians(self.longitude)
             x = (lon2 - lon1) * cos((lat1 + lat2) / 2)

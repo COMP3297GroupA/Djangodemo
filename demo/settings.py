@@ -116,11 +116,9 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'AirSupply: Drone Delivery API',
+    'TITLE': 'UniHaven Accommodation API',
     'DESCRIPTION': (
-        'API documentation for the ordering component of AirSupply.\n'
-        'You can manage products and orders here. No authorization is required to\n'
-        'use this training simulation. Use the base URL: https://www.airsupplysim.com/api/1'
+    'API for managing HKU staff accommodation reservations, including filtering, reserving, cancelling, and rating.'
     ),
     'VERSION': '0.1.0',
     'SERVE_INCLUDE_SCHEMA': False,

@@ -6,6 +6,7 @@ from .models import Accommodation, Reservation
 
 class AccommodationSerializer(serializers.ModelSerializer):
     is_reserved = serializers.ReadOnlyField()
+    distance = serializers.FloatField(read_only=True)  # 添加这个
 
     class Meta:
         model = Accommodation
@@ -30,6 +31,12 @@ class RatingSerializer(serializers.Serializer):
         if not 0 <= value <= 5:
             raise serializers.ValidationError("Rating must be between 0 and 5.")
         return value
+
+
+
+class CancelReservationSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
 
 
 

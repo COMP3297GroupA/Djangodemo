@@ -74,6 +74,23 @@ class Accommodation(models.Model):
             return round(EARTH_RADIUS * sqrt(x * x + y * y), 2)
         return None
 
+    def new_calculate_distance(self, ref_lat, ref_lon):
+        if self.latitude is not None and self.longitude is not None:
+            lat1 = radians(ref_lat)
+            lon1 = radians(ref_lon)
+            lat2 = radians(self.latitude)
+            lon2 = radians(self.longitude)
+            dlat = lat1 - lat2
+            dlon = lon1 - lon2
+            sinlat = sin(dlat)
+            sinlon = sin(dlong)
+            cosone = cos(lat1)
+            costwo = cos(lat2)
+            aaaa = sinlat * sinlat + cosone * costwo * sinlon * sinlon
+            cccc = asin(sqrt(aaaa))
+            return round(EARTH_RADIUS * cccc * 2, 2)
+        return None
+
     def save(self, *args, **kwargs):
         if not self.latitude or not self.longitude:
             self.fetch_location_data()
